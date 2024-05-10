@@ -1,0 +1,25 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gem 'puma'
+gem 'rackup'
+gem 'sinatra'
+gem 'sinatra-contrib'
+
+gem 'pg'
+gem 'sequel'
+
+group :development do
+  gem 'rb-fsevent'
+  gem 'rerun'
+
+  gem 'rubocop'
+  gem 'solargraph'
+
+  gem 'byebug'
+end
+
+group :test, :development do
+  gem 'rspec'
+end
