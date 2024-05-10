@@ -11,6 +11,8 @@ gem 'pg'
 gem 'sequel'
 
 group :development do
+  gem 'rake'
+
   gem 'rb-fsevent'
   gem 'rerun'
 
