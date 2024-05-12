@@ -31,6 +31,13 @@ class App < Sinatra::Base
     [201, json(note.values)]
   end
 
+  put '/notes/:id' do |id|
+    payload = JSON.parse(request.body.read)
+    note = Note.find(id: id)
+    note.update(payload)
+    [200, json(note.values)]
+  end
+
   delete '/notes/:id' do |id|
     Note[id]&.destroy
     [200, json(success: true)]
