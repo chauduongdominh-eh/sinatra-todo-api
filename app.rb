@@ -32,7 +32,7 @@ class App < Sinatra::Base
   end
 
   delete '/notes/:id' do |id|
-    Note[id].destroy
+    Note[id]&.destroy
     [200, json(success: true)]
   end
 end
