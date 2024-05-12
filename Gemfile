@@ -23,5 +23,8 @@ group :development do
 end
 
 group :test, :development do
+  gem 'database_cleaner-sequel'
+  gem 'factory_bot'
+  gem 'faker'
   gem 'rspec'
 end
