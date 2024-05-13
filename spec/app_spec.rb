@@ -14,10 +14,17 @@ RSpec.describe App do
     App
   end
 
-  describe 'GET /notes' do
-    let!(:note) { create :note }
+  let!(:user) { create :user }
 
-    it 'returns all notes' do
+  before do
+    header 'authorization', user.username
+    header 'content-type', 'application/json'
+  end
+
+  describe 'GET /notes' do
+    let!(:note) { create :note, user: user }
+
+    it 'returns all user notes' do
       get '/notes'
       expect(last_response.status).to be(200)
       expect(JSON.parse(last_response.body))
@@ -26,7 +33,7 @@ RSpec.describe App do
   end
 
   describe 'GET /notes/:id' do
-    let!(:note) { create :note }
+    let!(:note) { create :note, user: user }
 
     it 'returns all notes' do
       get '/notes'
@@ -38,9 +45,7 @@ RSpec.describe App do
 
   describe 'POST /notes' do
     let(:request) do
-      post '/notes',
-           { content: content }.to_json,
-           'CONTENT_TYPE' => 'application/json'
+      post '/notes', { content: content }.to_json
     end
 
     context 'when content is present' do
@@ -72,11 +77,9 @@ RSpec.describe App do
   end
 
   describe 'PUT /notes/:id' do
-    let(:note) { create :note }
+    let!(:note) { create :note, user: user }
     let(:request) do
-      put "/notes/#{note.id}",
-          { content: content }.to_json,
-          'CONTENT_TYPE' => 'application/json'
+      put "/notes/#{note.id}", { content: content }.to_json
     end
 
     context 'when content is present' do
@@ -111,7 +114,7 @@ RSpec.describe App do
 
   describe 'DELETE /notes/:id' do
     context 'when note exists' do
-      let!(:note) { create :note }
+      let!(:note) { create :note, user: user }
       let(:request) { delete "/notes/#{note.id}" }
 
       it 'reports success' do
