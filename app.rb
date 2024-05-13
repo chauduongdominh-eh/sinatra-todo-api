@@ -93,7 +93,10 @@ class App < Sinatra::Base
   end
 
   delete '/notes/:id' do |id|
-    Note[id]&.destroy
-    [200, json(success: true)]
+    note = Note[id]
+    raise NotFoundError unless authorize(@current_user, note)
+
+    note.destroy
+    200
   end
 end

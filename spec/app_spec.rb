@@ -128,9 +128,9 @@ RSpec.describe App do
     end
 
     context 'when note does not exist' do
-      it 'reports success as usual' do
+      it 'reports error' do
         delete '/notes/0'
-        expect(last_response.status).to be(200)
+        expect(last_response.status).to be(404)
       end
     end
   end
