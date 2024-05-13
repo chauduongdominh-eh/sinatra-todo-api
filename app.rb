@@ -35,7 +35,8 @@ class App < Sinatra::Base
     username = request.env['HTTP_AUTHORIZATION']
     payload = JSON.parse(request.body.read)
     current_user = User.find(username: username)
-    note = Note.create(payload, user_id: current_user.id)
+    payload['user_id'] = current_user.id
+    note = Note.create(payload)
     [201, json(note.values)]
   end
 
