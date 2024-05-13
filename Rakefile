@@ -13,7 +13,7 @@ def next_to_last_version
   if versions.size < 2
     0
   else
-    versions[-2]
+    versions[-2].to_i
   end
 end
 
