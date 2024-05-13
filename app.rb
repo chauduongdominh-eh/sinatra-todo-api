@@ -17,6 +17,12 @@ class App < Sinatra::Base
     [422, json(message: message)]
   end
 
+  post '/users' do
+    payload = JSON.parse(request.body.read)
+    user = User.create(payload)
+    [201, json(user.values)]
+  end
+
   get '/notes' do
     json(Note.order(:id).all.map(&:values))
   end
