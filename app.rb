@@ -7,16 +7,32 @@ require 'sinatra/json'
 class UnauthorizedError < StandardError
 end
 
+class AccessDeniedError < StandardError
+end
+
+class NotFoundError < StandardError
+end
+
+# Keep authorization simple for now
+def authorize(user, record)
+  case record
+  when Note
+    user.id == record.user_id
+  else
+    false
+  end
+end
+
 # Main application
 class App < Sinatra::Base
   set :show_exceptions, :after_handler
 
   before do
     content_type 'application/json'
-    authorize!
+    require_login!
   end
 
-  def authorize!
+  def require_login!
     username = request.env['HTTP_AUTHORIZATION']
     @current_user = User.find(username: username)
     raise UnauthorizedError unless @current_user
@@ -34,6 +50,14 @@ class App < Sinatra::Base
     error_response(401)
   end
 
+  error AccessDeniedError do
+    error_response(403)
+  end
+
+  error NotFoundError do
+    error_response(404)
+  end
+
   post '/users' do
     payload = JSON.parse(request.body.read)
     user = User.create(payload)
@@ -41,11 +65,15 @@ class App < Sinatra::Base
   end
 
   get '/notes' do
-    json(Note.order(:id).all.map(&:values))
+    json(Note.where(user_id: @current_user.id).order(:id).all.map(&:values))
   end
 
   get '/notes/:id' do |id|
-    json(Note[id].values)
+    note = Note[id]
+    # Raising AccessDeniedError will reveal the existence of this note
+    raise NotFoundError unless authorize(@current_user, note)
+
+    json(note.values)
   end
 
   post '/notes' do
@@ -56,8 +84,10 @@ class App < Sinatra::Base
   end
 
   put '/notes/:id' do |id|
+    note = Note[id]
+    raise NotFoundError unless authorize(@current_user, note)
+
     payload = JSON.parse(request.body.read)
-    note = Note.find(id: id)
     note.update(payload)
     [200, json(note.values)]
   end
